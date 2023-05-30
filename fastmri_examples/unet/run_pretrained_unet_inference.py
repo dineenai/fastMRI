@@ -39,7 +39,13 @@ def download_model(url, fname):
         unit_scale=True,
     )
 
-    with open(fname, "wb") as fh:
+    print("in_download_test")
+
+    # with open(fname, "wb") as fh:
+    # /data2/fastMRI/fastMRI/data/multicoil_test
+    # with open("/data/motion-dnns/fastMRI/data/brain_multicoil_test/pretrained_unet/"+fname, "wb") as fh:
+    # NOTE already downloaded in pwd 1.99 GB - now loaded at both locations but /data2 not useful unless change subsequent code
+    with open("/data2/fastMRI/fastMRI/pretrained_unet_brain_mc/model/"+fname, "wb") as fh:
         for chunk in response.iter_content(chunk_size):
             progress_bar.update(len(chunk))
             fh.write(chunk)
@@ -62,12 +68,30 @@ def run_unet_model(batch, model, device):
 def run_inference(challenge, state_dict_file, data_path, output_path, device):
     model = Unet(in_chans=1, out_chans=1, chans=256, num_pool_layers=4, drop_prob=0.0)
     # download the state_dict if we don't have it
+    print("inference test")
     if state_dict_file is None:
+        print("empty test")
+        # comment out as model not downloaded at "/data2/fastMRI/fastMRI/pretrained_unet_brain_mc/model/"
+        # SOLVED downloaded in pwd where needed instead 
         if not Path(MODEL_FNAMES[challenge]).exists():
+            print("download test")
             url_root = UNET_FOLDER
             download_model(url_root + MODEL_FNAMES[challenge], MODEL_FNAMES[challenge])
-
+        # print("download test")
+        # url_root = UNET_FOLDER 
+        # download_model(url_root + MODEL_FNAMES[challenge], MODEL_FNAMES[challenge])
+       
         state_dict_file = MODEL_FNAMES[challenge]
+
+    # attempted code fox 14/12 source: 
+    # import os
+    # CUDA_VISIBLE_DEVICES = "0"
+    # # # !CUDA_VISIBLE_DEVICES=0
+    # num_gpus = os.environ['CUDA_VISIBLE_DEVICES'].split(',').__len__()
+    # os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(f'{i}' for i in range(num_gpus))
+
+    # Device is: cuda, type <class 'torch.device'>
+    print(f"Device is: {device}, type {type(device)}")
 
     model.load_state_dict(torch.load(state_dict_file))
     model = model.eval()
@@ -90,28 +114,67 @@ def run_inference(challenge, state_dict_file, data_path, output_path, device):
             transform=data_transform,
             challenge="singlecoil",
         )
-    dataloader = torch.utils.data.DataLoader(dataset, num_workers=4)
+    # ERROR: RuntimeError: DataLoader worker (pid 28841) is killed by signal: Killed. 
+    # https://github.com/pytorch/pytorch/issues/8976
+    # dataloader = torch.utils.data.DataLoader(dataset, num_workers=4)
+    # dataloader = torch.utils.data.DataLoader(dataset, num_workers=0)
+    # dataloader = torch.utils.data.DataLoader(dataset, num_workers=1, batch_size=1)
+    dataloader = torch.utils.data.DataLoader(dataset, num_workers=1, batch_size=1)
 
     # run the model
     start_time = time.perf_counter()
-    outputs = defaultdict(list)
+    # outputs = defaultdict(list) #TMP
     model = model.to(device)
 
+    # Possible soln - decrease batch size BUT as not specified already 1 by default!
+
+    # for batch in tqdm(dataloader, desc="Running inference"):
+    #     with torch.no_grad():
+    #         output, slice_num, fname = run_unet_model(batch, model, device)
+    #     # print(f"TYPE of OUTPUTf: {type(output[fname])}") #TypeError: new(): invalid data type 'str'
+    #     print(f"TYPE of OUTPUTf: {type(output)}") # <class 'torch.Tensor'>
+    #     print(f"{fname}") #file_brain_AXFLAIR_200_6002441.h5
+
+    #     # MAYBE TRY TO OVERRISE INNSTEAD OF APPEND?????
+    #     outputs[fname].append((slice_num, output)) #AttributeError: 'numpy.ndarray' object has no attribute 'append'
+    #     print(f"TYPE of OUTPUT1: {type(output)}")
+    #     # add to block for now!
+    #     # save outputs
+    #     for fname in outputs:
+    #         outputs[fname] = np.stack([out for _, out in sorted(outputs[fname])])
+
+    #     fastmri.save_reconstructions(outputs, output_path / "reconstructions2")
+
+    #     end_time = time.perf_counter()
+    #     print(f"TYPE of OUTPUT2: {type(output)}")
+
+    #     print(f"Elapsed time for {len(dataloader)} slices: {end_time-start_time}")
+
+
     for batch in tqdm(dataloader, desc="Running inference"):
+        outputs = defaultdict(list)
         with torch.no_grad():
             output, slice_num, fname = run_unet_model(batch, model, device)
+        # print(f"TYPE of OUTPUT[0]: {type(output[0])}") # <class 'torch.Tensor'>
+        # print(f"TYPE of OUTPUTf: {type(output)}") # <class 'torch.Tensor'>
+        print(f"{fname}") #file_brain_AXFLAIR_200_6002441.h5
 
-        outputs[fname].append((slice_num, output))
+        # MAYBE TRY TO OVERRISE INNSTEAD OF APPEND?????
+        # on second ieration get #AttributeError: 'numpy.ndarray' object has no attribute 'append'
+        outputs[fname].append((slice_num, output)) #AttributeError: 'numpy.ndarray' object has no attribute 'append'
+        # print(f"TYPE of OUTPUT1: {type(output)}")
+        # add to block for now!
+        # save outputs
+        for fname in outputs:
+            outputs[fname] = np.stack([out for _, out in sorted(outputs[fname])])
 
-    # save outputs
-    for fname in outputs:
-        outputs[fname] = np.stack([out for _, out in sorted(outputs[fname])])
+        fastmri.save_reconstructions(outputs, output_path / "reconstructions2")
 
-    fastmri.save_reconstructions(outputs, output_path / "reconstructions")
+        end_time = time.perf_counter()
+        # print(f"TYPE of OUTPUT2: {type(output)}")  #<class 'torch.Tensor'>
 
-    end_time = time.perf_counter()
+        print(f"Elapsed time for {len(dataloader)} slices: {end_time-start_time}")
 
-    print(f"Elapsed time for {len(dataloader)} slices: {end_time-start_time}")
 
 
 if __name__ == "__main__":

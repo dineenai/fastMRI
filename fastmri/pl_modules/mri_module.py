@@ -11,7 +11,11 @@ from collections import defaultdict
 
 import fastmri
 import numpy as np
+# import pytorch_lightning as pl
 import pytorch_lightning as pl
+
+# Attempted instead:
+# import pytorch-lightning as pl #SyntaxError: invalid syntax
 import torch
 from fastmri import evaluate
 from torchmetrics.metric import Metric

@@ -1,0 +1,2 @@
+log_path: /data2/motion_dnns/train_atmpt2_no_crop_nvol_240_nsub_2_volumewise
+motion_data: /data2/motion_dnns/motion_data
