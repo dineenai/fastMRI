@@ -13,6 +13,8 @@ The following is a short list of fastMRI publications. Clicking on the title wil
 9. Sriram, A.\*, Zbontar, J.\*, Murrell, T., Defazio, A., Zitnick, C. L., Yakubova, N., ... & Johnson, P. (2020). [End-to-End Variational Networks for Accelerated MRI Reconstruction](#end-to-end-variational-networks-for-accelerated-mri-reconstruction). In *International Conference on Medical Image Computing and Computer-Assisted Intervention*, pages 64-73.
 10. Defazio, A., Murrell, T., & Recht, M. P. (2020). [MRI Banding Removal via Adversarial Training](#mri-banding-removal-via-adversarial-training). In *Advances in Neural Information Processing Systems*, 33, pages 7660-7670.
 11. Muckley, M. J.\*, Riemenschneider, B.\*, Radmanesh, A., Kim, S., Jeong, G., Ko, J., ... & Knoll, F. (2021). [Results of the 2020 fastMRI Challenge for Machine Learning MR Image Reconstruction](#results-of-the-2020-fastmri-challenge-for-machine-learning-mr-image-reconstruction). *IEEE Transactions on Medical Imaging*, 40(9), pages 2306-2317.
+12. Johnson, P. M., Jeong, G., Hammernik, K., Schlemper, J., Qin, C., Duan, J., ..., & Knoll, F. [Evaluation of the Robustness of Learned MR Image Reconstruction to Systematic Deviations Between Training and Test Data for the Models from the fastMRI Challenge](#evaluation-of-the-robustness-of-learned-mr-image-reconstruction-to-systematic-deviations-between-training-and-test-data-for-the-models-from-the-fastmri-challenge). In *MICCAI Machine Learning for Medical Image Reconstruction Workshop*, pages 25–34, 2021.
+13. Bakker, T., Muckley, M.J., Romero-Soriano, A., Drozdzal, M. & Pineda, L. (2022). [On learning adaptive acquisition policies for undersampled multi-coil MRI reconstruction](https://arxiv.org/abs/2203.16392). *Accepted at MIDL, 2022*, to appear.
 
 ## fastMRI: An open dataset and benchmarks for accelerated MRI
 
@@ -246,5 +248,38 @@ Accelerating MRI scans is one of the principal outstanding problems in the MRI r
     number={9},
     pages={2306--2317},
     doi={10.1109/TMI.2021.3075856}
+}
+```
+
+## Evaluation of the Robustness of Learned MR Image Reconstruction to Systematic Deviations Between Training and Test Data for the Models from the fastMRI Challenge
+
+[publication](https://doi.org/10.1007/978-3-030-88552-6_3)
+
+The 2019 fastMRI challenge was an open challenge designed to advance research in the field of machine learning for MR image reconstruction. The goal for the participants was to reconstruct undersampled MRI k-space data. The original challenge left an open question as to how well the reconstruction methods will perform in the setting where there is a systematic difference between training and test data. In this work we tested the generalization performance of the submissions with respect to various perturbations, and despite differences in model architecture and training, all of the methods perform very similarly.
+
+```bibtex
+@inproceedings{johnson2021evaluation,
+    author={Patricia M. Johnson and Geunu Jeong and Kerstin Hammernik and Jo Schlemper and Chen Qin and Jinming Duan and Daniel Rueckert and Jingu Lee and Nicola Pezzotti and Elwin De Weerdt and Sahar Yousefi and Mohamed S. Elmahdy and Jeroen Hendrikus Franciscus Van Gemert and Christophe Schülke and Mariya Doneva and Tim Nielsen and Sergey Kastryulin and Boudewijn P. F. Lelieveldt and Matthias J. P. Van Osch and Marius Staring and Eric Z. Chen and Puyang Wang and Xiao Chen and Terrence Chen and Vishal M. Patel and Shanhui Sun and Hyungseob Shin and Yohan Jun and Taejoon Eo and Sewon Kim and Taeseong Kim and Dosik Hwang and Patrick Putzky and Dimitrios Karkalousos and Jonas Teuwen and Nikita Miriakov and Bart Bakker and Matthan Caan and Max Welling and Matthew J. Muckley and Florian Knoll},
+    title={Evaluation of the Robustness of Learned {MR} Image Reconstruction to Systematic Deviations Between Training and Test Data for the Models from the {fastMRI} Challenge},
+    booktitle={International Workshop on Machine Learning for Medical Image Reconstruction},
+    year={2021},
+    pages={25--34},
+}
+```
+
+
+## On learning adaptive acquisition policies for undersampled multi-coil MRI reconstruction
+
+[publication](https://arxiv.org/abs/2203.16392)
+
+Most current approaches to undersampled multi-coil MRI reconstruction focus on learning the reconstruction model for a fixed, equidistant acquisition trajectory. In this paper, we study the problem of joint learning of the reconstruction model together with acquisition policies. To this end, we extend the End-to-End Variational Network with learnable acquisition policies that can adapt to different data points. We validate our model on a coil-compressed version of the large scale undersampled multi-coil fastMRI dataset using two undersampling factors: 4× and 8×. Our experiments show on-par performance with the learnable non-adaptive and handcrafted equidistant strategies at 4×, and an observed improvement of more than 2% in SSIM at 8× acceleration, suggesting that potentially-adaptive k-space acquisition trajectories can improve reconstructed image quality for larger acceleration factors. However, and perhaps surprisingly, our best performing policies learn to be explicitly non-adaptive.
+
+```BibTeX
+@article{bakker2022adaptive,
+    title={On learning adaptive acquisition policies for undersampled multi-coil {MRI} reconstruction},
+    author={Tim Bakker and Matthew Muckley and Adriana Romero-Soriano and Michal Drozdzal and Luis Pineda},
+    journal={Proceedings of Machine Learning Research (MIDL)},
+    pages={to appear},
+    year={2022},
 }
 ```
